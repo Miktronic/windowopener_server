@@ -20,7 +20,11 @@ class CreateUsersTable extends Migration
             $table->enum('role', ['admin', 'customer'])->default('customer');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->boolean('gps_location')->default(false);
             $table->string('address')->nullable();
+            $table->string('zip_code')->nullable();
+            $table->string('latitude')->nullable();
+            $table->string('longitude')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

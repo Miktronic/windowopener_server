@@ -157,8 +157,16 @@ class AuthController extends Controller
         $user = User::find($request->user()->id);
         if($request->has('name'))
             $user->name = $request->name;
+        if($request->has('gps_location'))
+            $user->gps_location = $request->gps_location;
         if($request->has('address'))
             $user->address = $request->address;
+        if($request->has('zip_code'))
+            $user->zip_code = $request->zip_code;
+        if($request->has('latitude'))
+            $user->latitude = $request->latitude;
+        if($request->has('longitude'))
+            $user->longitude = $request->longitude;
         $user->save();
         return response()->json(['data' => $user->makeHidden(['created_at', 'updated_at', 'email_verified_at', 'role'])], 201);
     }
