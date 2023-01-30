@@ -36,7 +36,7 @@ You can choose either one for your development
 ## Usage
 1. Clone repo
 ```
-git clone https://github.com/WhiteBoardCrypto/GrandpasDashboard
+git clone https://github.com/ClickyProductDevelopment/windowopener_server
 ```
 2. Install using composer `composer install`
 3. Run `yarn install`
