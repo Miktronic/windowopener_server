@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\User;
+use App\Services\WeatherService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -39,6 +40,7 @@ class OutsideTemp extends Command
      */
     public function handle()
     {
+        $weatherService = new WeatherService();
         $users = User::all();
         foreach ($users as $user){
             Log::info("Syncing user " . $user->name . "\n");
@@ -46,7 +48,10 @@ class OutsideTemp extends Command
             $lat = $user->city?->latitude;
             $lang = $user->city?->longitude;
             if($lat && $lang){
-                // get the temperature
+                $response = $weatherService->get('current', ['q' => "$lat,$lang"]);
+                if ($response['success']) {
+                    dd($response['data']['current']['temp_c'],$response['data']['current']['temp_f']);
+                }
             }else{
                 Log::info("Syncing user " . $user->name . "\n");
             }
