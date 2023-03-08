@@ -2,9 +2,6 @@
 
 namespace App\Console;
 
-use App\Console\Commands\BitcoinTransactionTracker;
-use App\Console\Commands\EthereumTransactionTracker;
-use App\Console\Commands\PolygonTransactionTracker;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
