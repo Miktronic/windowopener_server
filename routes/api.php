@@ -68,6 +68,9 @@ Route::group(['middleware' => 'auth:sanctum'], function() {
             Route::post('/profile', [App\Http\Controllers\Api\Auth\AuthController::class,'updateProfile']);
             Route::post('/changePassword', [App\Http\Controllers\Api\Auth\AuthController::class,'changePasswordByAppUser']);
         });
+
+        Route::get('/temperature/{user}', [App\Http\Controllers\Api\TemperatureController::class,'outsideTemperature']);
+
         Route::prefix('device')->group(function(){
             Route::get('/', [App\Http\Controllers\Api\DeviceController::class,'getDevices']);
             Route::post('/', [App\Http\Controllers\Api\DeviceController::class,'createByApp']);

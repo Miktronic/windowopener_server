@@ -54,4 +54,9 @@ class User extends Authenticatable
     public function city(){
         return $this->belongsTo(City::class, 'city_id');
     }
+
+    public function temperature()
+    {
+        return $this->hasOne(Setting::class, 'user_id', 'id');
+    }
 }
