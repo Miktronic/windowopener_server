@@ -14,7 +14,7 @@ class ChangeDevicesTableStatusColumnType extends Migration
     public function up()
     {
         Schema::table('devices', function (Blueprint $table) {
-            $table->double('status')->change()->nullable();
+            $table->float('status')->default(0)->change();
         });
     }
 
