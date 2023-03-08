@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Setting;
 use App\Models\User;
 use App\Services\WeatherService;
 use Illuminate\Console\Command;
@@ -43,14 +44,20 @@ class OutsideTemp extends Command
         $weatherService = new WeatherService();
         $users = User::all();
         foreach ($users as $user){
-            Log::info("Syncing user " . $user->name . "\n");
             // user lat, log
             $lat = $user->city?->latitude;
             $lang = $user->city?->longitude;
             if($lat && $lang){
                 $response = $weatherService->get('current', ['q' => "$lat,$lang"]);
                 if ($response['success']) {
-                    dd($response['data']['current']['temp_c'],$response['data']['current']['temp_f']);
+                    Setting::query()->updateOrCreate(
+                        [
+                            'user_id' => $user->id,
+                        ],
+                        [
+                            'outside_temperature' => $response['data']['current']['temp_f'] ?? null,
+                        ]
+                    );
                 }
             }else{
                 Log::info("Syncing user " . $user->name . "\n");
