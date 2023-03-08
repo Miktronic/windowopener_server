@@ -44,7 +44,7 @@ class DeviceController extends Controller
         if($request->has('high_temperature'))
             $device->high_temperature = $request->high_temperature;
         $device->user_id = $request->user()->id;
-        $device->status = 'Open';
+        $device->status = 0;
         $device->save();
         return response()->json(['data' => $device]);
     }
@@ -138,16 +138,14 @@ class DeviceController extends Controller
     public function setOpenStatus(Request $request, $id)
     {
         $request->validate([
-            'value' => ['required', 'in:Open,Close'],
+            'value' => ['required', 'numeric|min:0|max:100'],
         ]);
 
         $device = Device::find($id);
         $device->status = $request->value;
         $device->save();
 
-        $cmd = 'mosquitto_pub -t /node/0/' . $device->device_address . ' -m "{\"id\":\"' . $device->device_address . '\",\"cmd\":1}"';
-        if($device->status == 'Close')
-            $cmd = 'mosquitto_pub -t /node/0/' . $device->device_address . ' -m "{\"id\":\"' . $device->device_address . '\",\"cmd\":0}"';
+        $cmd = 'mosquitto_pub -t /node/0/' . $device->device_address . ' -m "{\"id\":\"' . $device->device_address . '\",\"cmd\":' . $device->status .'}"';
         Log::info("Run this command: " . $cmd);
         shell_exec($cmd);
 

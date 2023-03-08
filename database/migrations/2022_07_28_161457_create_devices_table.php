@@ -23,10 +23,10 @@ class CreateDevicesTable extends Migration
             $table->foreignId('state_id')->nullable();
             $table->foreignId('city_id')->nullable();
             $table->enum('is_auto', ['Yes', 'No'])->default('No');
-            $table->double('low_temperature', 5, 2)->nullable();
-            $table->double('high_temperature', 5, 2)->nullable();
             $table->foreignId('user_id');
-            $table->enum('status', ['Open', 'Close'])->default('Close');
+            $table->float('status')->default(0);
+            $table->boolean('is_temp_include')->default(1);
+            $table->boolean('is_hum_include')->default(1);
             $table->timestamps();
         });
     }

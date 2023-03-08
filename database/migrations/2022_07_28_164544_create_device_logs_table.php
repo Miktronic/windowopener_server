@@ -16,7 +16,7 @@ class CreateDeviceLogsTable extends Migration
         Schema::create('device_logs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('device_id');
-            $table->enum('status', ['Open', 'Close'])->default('Close');
+            $table->float('status')->default(0);
             $table->enum('is_auto', ['Yes', 'No'])->default('No');
             $table->double('temperature', 5, 2)->default(0);
             $table->timestamp('timestamp');

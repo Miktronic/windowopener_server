@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -26,6 +28,7 @@ class User extends Authenticatable
         'latitude',
         'longitude',
         'password',
+        'city_id'
     ];
 
     /**
@@ -55,8 +58,20 @@ class User extends Authenticatable
         return $this->belongsTo(City::class, 'city_id');
     }
 
-    public function temperature()
+    public function settings(): HasOne
     {
         return $this->hasOne(Setting::class, 'user_id', 'id');
+    }
+
+    public function devices(): HasMany
+    {
+        return $this->hasMany(Device::class, 'user_id');
+    }
+
+    public function insideTemp(){
+        return $this->devices()
+            ->where('is_temp_include', true)
+            ->map(fn($device) => $device->log->temperature)
+            ->avg();
     }
 }

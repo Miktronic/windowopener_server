@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::post('/login', [App\Http\Controllers\Api\Auth\AuthController::class,'authenticate']);
+    Route::post('/login', [App\Http\Controllers\Api\Auth\AuthController::class,'authenticate']);
 Route::post('/register', [App\Http\Controllers\Api\Auth\AuthController::class,'register']);
 
 Route::prefix('v1')->group(function() {
@@ -67,9 +66,10 @@ Route::group(['middleware' => 'auth:sanctum'], function() {
             });
             Route::post('/profile', [App\Http\Controllers\Api\Auth\AuthController::class,'updateProfile']);
             Route::post('/changePassword', [App\Http\Controllers\Api\Auth\AuthController::class,'changePasswordByAppUser']);
-        });
 
-        Route::get('/temperature/{user}', [App\Http\Controllers\Api\TemperatureController::class,'outsideTemperature']);
+            // Temperature
+            Route::get('/settings', [App\Http\Controllers\Api\SettingsController::class, 'index']);
+        });
 
         Route::prefix('device')->group(function(){
             Route::get('/', [App\Http\Controllers\Api\DeviceController::class,'getDevices']);

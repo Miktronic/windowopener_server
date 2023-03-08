@@ -44,11 +44,14 @@ class OutsideTemp extends Command
         $weatherService = new WeatherService();
         $users = User::all();
         foreach ($users as $user){
+            Log::info("Start syncing user " . $user->name . "\n");
+
             // user lat, log
             $lat = $user->city?->latitude;
-            $lang = $user->city?->longitude;
-            if($lat && $lang){
-                $response = $weatherService->get('current', ['q' => "$lat,$lang"]);
+            $long = $user->city?->longitude;
+
+            if($lat && $long){
+                $response = $weatherService->get('current', ['q' => "$lat,$long"]);
                 if ($response['success']) {
                     Setting::query()->updateOrCreate(
                         [
@@ -60,8 +63,9 @@ class OutsideTemp extends Command
                     );
                 }
             }else{
-                Log::info("Syncing user " . $user->name . "\n");
+                Log::info("lat, long not found!! \n");
             }
+            Log::info("End syncing user " . $user->name . "\n");
         }
     }
 }

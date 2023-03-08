@@ -16,12 +16,13 @@ class CreateSettingsTable extends Migration
         Schema::create('settings', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')
-                ->constrained('users')
+                ->constrained('users', 'id')
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
             $table->double('outside_temperature', 5, 2)->nullable();
-            $table->float('status')->nullable();
-            $table->enum('is_auto', ['Yes', 'No'])->default('No');
+            $table->boolean('is_auto')->default(1);
+            $table->double('low_temperature', 5, 2)->nullable();
+            $table->double('high_temperature', 5, 2)->nullable();
             $table->timestamps();
         });
     }
