@@ -15,7 +15,7 @@ class DeviceObserver
      */
     public function created(Device $device)
     {
-        //
+        $this->syncDeviceMode($device);
     }
 
     /**
@@ -26,17 +26,7 @@ class DeviceObserver
      */
     public function updated(Device $device)
     {
-        $user = $device->user;
-        $settings = $user->settings;
-
-        $is_auto =$settings->is_auto;
-        $low_temperature = $settings->low_temperature;
-        $high_temperature = $settings->high_temperature;
-
-        $cmd = 'mosquitto_pub -t /node/0/' . $device->device_address . ' -m "{\"id\":\"' . $device->device_address . '\",\"auto\":' . $is_auto . ',\"low_temp\":' . $low_temperature . ',\"high_temp\":' . $high_temperature . '}"';
-
-        Log::info("Run this command: " . $cmd);
-        shell_exec($cmd);
+        $this->syncDeviceMode($device);
     }
 
     /**
@@ -70,5 +60,24 @@ class DeviceObserver
     public function forceDeleted(Device $device)
     {
         //
+    }
+
+    /**
+     * @param Device $device
+     * @return void
+     */
+    public function syncDeviceMode(Device $device): void
+    {
+        $user = $device->user;
+        $settings = $user->settings;
+
+        $is_auto = $settings->is_auto;
+        $low_temperature = $settings->low_temperature;
+        $high_temperature = $settings->high_temperature;
+
+        $cmd = 'mosquitto_pub -t /node/0/' . $device->device_address . ' -m "{\"id\":\"' . $device->device_address . '\",\"auto\":' . $is_auto . ',\"low_temp\":' . $low_temperature . ',\"high_temp\":' . $high_temperature . '}"';
+
+        Log::info("Run this command: " . $cmd);
+        shell_exec($cmd);
     }
 }

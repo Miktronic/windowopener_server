@@ -25,71 +25,43 @@ class DeviceController extends Controller
         return response()->json(['data' => $device->makeHidden(['created_at', 'updated_at', 'type', 'creator', 'user_id', 'location', 'country_id', 'state_id', 'city_id'])]);
     }
 
-    public function create(Request $request) {
-        $request->validate([
-            'device_address' => ['required', 'string', 'max:255', 'unique:devices'],
-        ]);
-
-        $device = new Device();
-        if($request->has('alias'))
-            $device->alias = $request->alias;
-        $device->device_address = $request->device_address;
-        if($request->has('type'))
-            $device->type = $request->type;
-        if($request->has('location'))
-            $device->location = $request->location;
-        $device->user_id = $request->user()->id;
-        $device->status = 0;
-        $device->save();
-        return response()->json(['data' => $device]);
-    }
-
-    public function createByApp(Request $request)
+    public function create(Request $request)
     {
-        Log::info($request);
-        $request->validate([
-            'device_address' => ['required', 'string', 'max:255', 'unique:devices'],
+        $attrs = $request->validate([
+            'alias' => ['nullable', 'string'],
+            'device_address' => ['required', 'string'],
+            'type' => ['required', 'integer'],
+            'location' => ['nullable', 'string'],
+            'country_id' => ['nullable', 'exists:countries,id'],
+            'state_id' => ['nullable', 'exists:states,id'],
+            'city_id' => ['nullable', 'exists:cities,id'],
+            'user_id' => ['nullable', 'exists:users,id'],
+            'status' => ['required', 'numeric'],
+            'is_temp_include' => ['required', 'boolean'],
+            'is_hum_include' => ['required', 'boolean'],
         ]);
 
-        $device = new Device();
-        if($request->has('alias'))
-            $device->alias = $request->alias;
-        $device->device_address = $request->device_address;
-        if($request->has('country'))
-            $device->country_id = $request->country["id"];
-        if($request->has('state'))
-            $device->state_id = $request->state["id"];
-        if($request->has('city') && isset($request->city["id"]))
-            $device->city_id = $request->city["id"];
-        $device->user_id = $request->user()->id;
-        if($request->has('status'))
-            $device->status = $request->status;
-        $device->save();
+        foreach($attrs as $key => $value){
+            if($value === null) unset($attrs[$key]);
+        }
 
-        $cmd = 'mosquitto_pub -t /node/0/' . $device->device_address . ' -m "{\"id\":\"' . $device->device_address . '\",\"auto\":1,\"low_temp\":' . $device->low_temperature . ',\"high_temp\":' . $device->high_temperature . '}"';
-        if($device->is_auto == 'No')
-            $cmd = 'mosquitto_pub -t /node/0/' . $device->device_address . ' -m "{\"id\":\"' . $device->device_address . '\",\"auto\":0,\"low_temp\":' . $device->low_temperature . ',\"high_temp\":' . $device->high_temperature . '}"';
-        Log::info("Run this command: " . $cmd);
-        shell_exec($cmd);
-
-        $device = Device::find($device->id);
-        return response()->json(['data' => $device->makeHidden(['created_at', 'updated_at', 'type', 'creator', 'user_id', 'location', 'country_id', 'state_id', 'city_id'])]);
+        return Device::create($attrs);
     }
 
     public function update(Device $device, Request $request)
     {
         $attrs = $request->validate([
-           'alias' => ['nullable', 'string'],
-           'device_address' => ['required', 'string'],
-           'type' => ['required', 'integer'],
-           'location' => ['nullable', 'string'],
-           'country_id' => ['nullable', 'exists:countries,id'],
-           'state_id' => ['nullable', 'exists:states,id'],
-           'city_id' => ['nullable', 'exists:cities,id'],
-           'user_id' => ['nullable', 'exists:users,id'],
-           'status' => ['required', 'numeric'],
-           'is_temp_include' => ['required', 'boolean'],
-           'is_hum_include' => ['required', 'boolean'],
+           'alias' => ['sometimes', 'string'],
+           'device_address' => ['sometimes', 'string'],
+           'type' => ['sometimes', 'integer'],
+           'location' => ['sometimes', 'string'],
+           'country_id' => ['sometimes', 'exists:countries,id'],
+           'state_id' => ['sometimes', 'exists:states,id'],
+           'city_id' => ['sometimes', 'exists:cities,id'],
+           'user_id' => ['sometimes', 'exists:users,id'],
+           'status' => ['sometimes', 'numeric'],
+           'is_temp_include' => ['sometimes', 'boolean'],
+           'is_hum_include' => ['sometimes', 'boolean'],
         ]);
 
         foreach($attrs as $key => $value){
@@ -99,23 +71,6 @@ class DeviceController extends Controller
         $device->update($attrs);
 
         return $device;
-    }
-
-    public function setOpenStatus(Request $request, $id)
-    {
-        $request->validate([
-            'value' => ['required', 'numeric|min:0|max:100'],
-        ]);
-
-        $device = Device::find($id);
-        $device->status = $request->value;
-        $device->save();
-
-        $cmd = 'mosquitto_pub -t /node/0/' . $device->device_address . ' -m "{\"id\":\"' . $device->device_address . '\",\"cmd\":' . $device->status .'}"';
-        Log::info("Run this command: " . $cmd);
-        shell_exec($cmd);
-
-        return response()->json(['data' => $device->makeHidden(['created_at', 'updated_at', 'type', 'creator', 'user_id', 'location', 'country_id', 'state_id', 'city_id'])]);
     }
 
     public function delete($id) {

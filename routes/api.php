@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-    Route::post('/login', [App\Http\Controllers\Api\Auth\AuthController::class,'authenticate']);
+Route::post('/login', [App\Http\Controllers\Api\Auth\AuthController::class,'authenticate']);
 Route::post('/register', [App\Http\Controllers\Api\Auth\AuthController::class,'register']);
 
 Route::prefix('v1')->group(function() {
@@ -76,11 +76,10 @@ Route::group(['middleware' => 'auth:sanctum'], function() {
 
         Route::prefix('device')->group(function(){
             Route::get('/', [App\Http\Controllers\Api\DeviceController::class,'getDevices']);
-            Route::post('/', [App\Http\Controllers\Api\DeviceController::class,'createByApp']);
+            Route::post('/', [App\Http\Controllers\Api\DeviceController::class,'store']);
             Route::get('/{id}', [App\Http\Controllers\Api\DeviceController::class,'getDeviceByApp']);
             Route::put('/{device}', [App\Http\Controllers\Api\DeviceController::class,'update']);
             Route::delete('/{id}', [App\Http\Controllers\Api\DeviceController::class,'delete']);
-            Route::post('/{id}/setOpenStatus', [App\Http\Controllers\Api\DeviceController::class,'setOpenStatus']);
         });
         Route::prefix('log')->group(function(){
             Route::post('/', [App\Http\Controllers\Api\DeviceLogController::class,'getLogsByApp']);
