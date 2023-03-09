@@ -23,7 +23,7 @@ class CreateDevicesTable extends Migration
             $table->foreignId('state_id')->nullable();
             $table->foreignId('city_id')->nullable();
             $table->foreignId('user_id');
-            $table->float('status')->default(0);
+            $table->integer('status')->default(0);
             $table->boolean('is_temp_include')->default(1);
             $table->boolean('is_hum_include')->default(1);
             $table->timestamps();

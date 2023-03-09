@@ -2,7 +2,7 @@ import { all } from 'redux-saga/effects';
 import authenticateSaga from './Authenticate/apiSaga';
 import userSaga from './User/apiSaga';
 import deviceSaga from './Device/apiSaga';
-import deviceLogsSaga from './deviceLogs/apiSaga';
+import deviceLogsSaga from './DeviceLogs/apiSaga';
 import userLogsSaga from './UserLogs/apiSaga';
 import dashboardSaga from './Dashboard/apiSaga';
 

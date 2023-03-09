@@ -1,6 +1,6 @@
 const constants = {
-    PUBLIC_URL: "http://198.211.108.247",
-    HOST_URL: "http://198.211.108.247/api",
+    PUBLIC_URL: "http://192.168.31.207:8000",
+    HOST_URL: "http://192.168.31.207:8000/api",
 
     // PUBLIC_URL: "http://localhost:8000",
     // HOST_URL: "http://localhost:8000/api",

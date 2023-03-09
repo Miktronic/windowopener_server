@@ -36,7 +36,7 @@ class DeviceController extends Controller
             'state_id' => ['nullable', 'exists:states,id'],
             'city_id' => ['nullable', 'exists:cities,id'],
             'user_id' => ['nullable', 'exists:users,id'],
-            'status' => ['required', 'numeric'],
+            'status' => ['required', 'integer'],
             'is_temp_include' => ['required', 'boolean'],
             'is_hum_include' => ['required', 'boolean'],
         ]);
@@ -59,7 +59,7 @@ class DeviceController extends Controller
            'state_id' => ['sometimes', 'exists:states,id'],
            'city_id' => ['sometimes', 'exists:cities,id'],
            'user_id' => ['sometimes', 'exists:users,id'],
-           'status' => ['sometimes', 'numeric'],
+           'status' => ['sometimes', 'integer'],
            'is_temp_include' => ['sometimes', 'boolean'],
            'is_hum_include' => ['sometimes', 'boolean'],
         ]);
