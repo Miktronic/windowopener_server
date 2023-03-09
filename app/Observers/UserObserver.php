@@ -16,7 +16,7 @@ class UserObserver
     {
         // create a settings
         $user->settings()->create([
-
+            //
         ]);
     }
 

@@ -16,9 +16,10 @@ class SettingsResource extends JsonResource
     {
         return [
           'outside_temperature' => $this->outside_temperature,
-            'inside_temperature' => $this->insideTemp(),
-            'status' => $this->status,
+            'inside_temperature' => $this->user->insideTemp(),
             'is_auto' => $this->is_auto,
+            'low_temperature' => $this->low_temperature,
+            'high_temperature' => $this->high_temperature,
         ];
     }
 }

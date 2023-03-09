@@ -69,6 +69,7 @@ Route::group(['middleware' => 'auth:sanctum'], function() {
 
             // Temperature
             Route::get('/settings', [App\Http\Controllers\Api\SettingsController::class, 'index']);
+            Route::put('/settings', [App\Http\Controllers\Api\SettingsController::class, 'update']);
         });
 
         Route::prefix('device')->group(function(){

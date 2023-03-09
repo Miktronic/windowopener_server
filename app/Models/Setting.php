@@ -14,4 +14,8 @@ class Setting extends Model
         'status',
         'is_auto',
     ];
+
+    public function user(){
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }

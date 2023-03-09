@@ -70,7 +70,8 @@ class User extends Authenticatable
 
     public function insideTemp(){
         return $this->devices()
-            ->where('is_temp_include', true)
+            ->where('is_temp_include', 1)
+            ->get()
             ->map(fn($device) => $device->log->temperature)
             ->avg();
     }
