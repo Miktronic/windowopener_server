@@ -66,19 +66,20 @@ Route::group(['middleware' => 'auth:sanctum'], function() {
             });
             Route::post('/profile', [App\Http\Controllers\Api\Auth\AuthController::class,'updateProfile']);
             Route::post('/changePassword', [App\Http\Controllers\Api\Auth\AuthController::class,'changePasswordByAppUser']);
+        });
 
-            // Temperature
-            Route::get('/settings', [App\Http\Controllers\Api\SettingsController::class, 'index']);
-            Route::put('/settings', [App\Http\Controllers\Api\SettingsController::class, 'update']);
+        // Temperature
+        Route::prefix('settings')->group(function(){
+            Route::get('/', [App\Http\Controllers\Api\SettingsController::class, 'index']);
+            Route::put('/', [App\Http\Controllers\Api\SettingsController::class, 'update']);
         });
 
         Route::prefix('device')->group(function(){
             Route::get('/', [App\Http\Controllers\Api\DeviceController::class,'getDevices']);
             Route::post('/', [App\Http\Controllers\Api\DeviceController::class,'createByApp']);
             Route::get('/{id}', [App\Http\Controllers\Api\DeviceController::class,'getDeviceByApp']);
-            Route::put('/{id}', [App\Http\Controllers\Api\DeviceController::class,'updateDeviceByApp']);
+            Route::put('/{device}', [App\Http\Controllers\Api\DeviceController::class,'update']);
             Route::delete('/{id}', [App\Http\Controllers\Api\DeviceController::class,'delete']);
-            Route::post('/{id}/setAutoMode', [App\Http\Controllers\Api\DeviceController::class,'setAutoMode']);
             Route::post('/{id}/setOpenStatus', [App\Http\Controllers\Api\DeviceController::class,'setOpenStatus']);
         });
         Route::prefix('log')->group(function(){

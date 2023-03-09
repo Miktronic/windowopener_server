@@ -2,7 +2,11 @@
 
 namespace App\Providers;
 
+use App\Models\Device;
+use App\Models\Setting;
 use App\Models\User;
+use App\Observers\DeviceObserver;
+use App\Observers\SettingObserver;
 use App\Observers\UserObserver;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -30,5 +34,7 @@ class EventServiceProvider extends ServiceProvider
     public function boot()
     {
         User::observe(UserObserver::class);
+        Setting::observe(SettingObserver::class);
+        Device::observe(DeviceObserver::class);
     }
 }

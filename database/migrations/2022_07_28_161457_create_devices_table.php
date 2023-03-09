@@ -22,7 +22,6 @@ class CreateDevicesTable extends Migration
             $table->foreignId('country_id')->nullable();
             $table->foreignId('state_id')->nullable();
             $table->foreignId('city_id')->nullable();
-            $table->enum('is_auto', ['Yes', 'No'])->default('No');
             $table->foreignId('user_id');
             $table->float('status')->default(0);
             $table->boolean('is_temp_include')->default(1);
