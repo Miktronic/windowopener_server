@@ -47,8 +47,8 @@ class OutsideTemp extends Command
             Log::info("Start syncing user " . $user->name . "\n");
 
             // user lat, log
-            $lat = $user->city?->latitude;
-            $long = $user->city?->longitude;
+            $lat = $user?->latitude;
+            $long = $user->longitude;
 
             if($lat && $long){
                 $response = $weatherService->get('current', ['q' => "$lat,$long"]);
