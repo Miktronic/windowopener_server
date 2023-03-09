@@ -9,14 +9,6 @@ class DeviceLog extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'device_id',
-        'status',
-        'method',
-        'temperature',
-        'timestamp',
-    ];
-
     protected $appends = ['alias', 'device_address', 'status_label', 'content'];
 
     public function getDeviceAddressAttribute() {

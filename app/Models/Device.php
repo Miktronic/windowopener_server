@@ -10,21 +10,6 @@ class Device extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'alias',
-        'device_address',
-        'type',
-        'location',
-        'country_id',
-        'state_id',
-        'city_id',
-        'is_auto',
-        'low_temperature',
-        'high_temperature',
-        'user_id',
-        'status'
-    ];
-
     protected $appends = ['creator', 'country', 'state', 'city'];
 
     public function getCreatorAttribute() {
