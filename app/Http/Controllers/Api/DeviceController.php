@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Device;
 use App\Models\DeviceLog;
-use Illuminate\Support\Facades\Log;
 
 class DeviceController extends Controller
 {
@@ -45,6 +44,7 @@ class DeviceController extends Controller
             if($value === null) unset($attrs[$key]);
         }
 
+        $attrs['user_id'] = auth()->user()->id;
         return Device::create($attrs);
     }
 
