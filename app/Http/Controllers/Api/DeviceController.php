@@ -25,7 +25,7 @@ class DeviceController extends Controller
         return response()->json(['data' => $device->makeHidden(['created_at', 'updated_at', 'type', 'creator', 'user_id', 'location', 'country_id', 'state_id', 'city_id'])]);
     }
 
-    public function create(Request $request)
+    public function store(Request $request)
     {
         $attrs = $request->validate([
             'alias' => ['nullable', 'string'],
