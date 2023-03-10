@@ -38,7 +38,7 @@ class Device extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function log(): HasMany
+    public function logs(): HasMany
     {
         return $this->hasMany(DeviceLog::class, 'device_id');
     }
