@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Device extends Model
@@ -37,8 +38,8 @@ class Device extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function log(): HasOne
+    public function log(): HasMany
     {
-        return $this->hasOne(DeviceLog::class, 'device_id');
+        return $this->hasMany(DeviceLog::class, 'device_id');
     }
 }

@@ -54,7 +54,7 @@ class User extends Authenticatable
         return $this->devices()
             ->where('is_temp_include', 1)
             ->get()
-            ->map(fn($device) => $device->log ? $device->log->temperature : 0)
+            ->map(fn($device) => $device->logs()->exists() ? $device->logs()->orderBy('id', 'desc')->first()->temperature : 0)
             ->avg();
     }
 }
