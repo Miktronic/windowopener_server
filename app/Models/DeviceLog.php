@@ -26,6 +26,19 @@ class DeviceLog extends Model
     }
 
     public function getContentAttribute() {
-        return $this->status == 'Close' ? 'The window is closed' : 'The window is open.';
+        $msg = "";
+        if($this->status == 0){
+            $msg = 'The window is closed';
+        }else if($this->status == 25){
+            $msg = 'The window is quarterly open.';
+        }else if($this->status == 50){
+            $msg = 'The window is half open.';
+        }else if($this->status == 75){
+            $msg = 'The window is three quarterly open.';
+        }else if($this->status == 100){
+            $msg = 'The window is fully open.';
+        }
+
+        return $msg;
     }
 }
