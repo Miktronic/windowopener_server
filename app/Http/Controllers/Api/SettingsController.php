@@ -23,7 +23,7 @@ class SettingsController extends Controller
 
     public function update(Request $request){
         $attrs = $request->validate([
-            'is_auto' => ['boolean', 'nullable'],
+            'is_auto' => ['nullable', 'boolean'],
             'low_temperature' => ['nullable', 'numeric'],
             'high_temperature' => ['nullable', 'numeric'],
         ]);
