@@ -44,7 +44,7 @@ class SyncDeviceStatus extends Command
             $devices = $user->devices;
             foreach ($devices as $device){
                 $this->info("device: " . $device->device_address . "\n");
-                $cmd = 'mosquitto_pub -t /node/0/' . $device->device_address . ' -m "{\"id\":\"' . $device->device_address . '\",\"auto\":' . $user->settings->is_auto . '\",\"status\":' . $device->status . ',\"low_temp\":' . $user->settings->low_temperature . ',\"high_temp\":' . $user->settings->high_temperature . '}"';
+                $cmd = 'mosquitto_pub -t /node/0/' . $device->device_address . ' -m "{\"id\":\"' . $device->device_address . '\",\"auto\":' . $user->settings->is_auto . '\",\"cmd\":' . $device->status . ',\"low_temp\":' . $user->settings->low_temperature . ',\"high_temp\":' . $user->settings->high_temperature . '}"';
                 $this->info("Run this command: " . $cmd . "\n");
                 $res = shell_exec($cmd);
                 $this->info("response: " . $res . "\n");
