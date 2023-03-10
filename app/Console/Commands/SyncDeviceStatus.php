@@ -39,7 +39,7 @@ class SyncDeviceStatus extends Command
      */
     public function handle()
     {
-        $users = User::all()->map(fn($user) => $user->settings->is_auto === 1);
+        $users = User::all()->filter(fn($user) => $user->settings->is_auto === 1);
         foreach ($users as $user){
             $devices = $user->devices;
             foreach ($devices as $device){
