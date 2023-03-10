@@ -24,7 +24,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->call([new OutsideTemp(), new SyncDeviceStatus()])->everyFiveMinutes();
+        $schedule->call( new OutsideTemp() )->everyMinute();
+        $schedule->call( new SyncDeviceStatus() )->everyMinute();
     }
 
     /**
