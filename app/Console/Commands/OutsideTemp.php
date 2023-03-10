@@ -47,7 +47,7 @@ class OutsideTemp extends Command
             Log::info("Start syncing user " . $user->name . "\n");
 
             // user lat, log
-            $lat = $user?->latitude;
+            $lat = $user->latitude;
             $long = $user->longitude;
 
             if($lat && $long){
