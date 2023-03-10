@@ -37,8 +37,8 @@ class DeviceController extends Controller
             'city_id' => ['nullable', 'exists:cities,id'],
             'user_id' => ['nullable', 'exists:users,id'],
             'status' => ['required', 'integer'],
-            'is_temp_include' => ['required', 'boolean'],
-            'is_hum_include' => ['required', 'boolean'],
+            'is_temp_include' => ['nullable', 'boolean'],
+            'is_hum_include' => ['nullable', 'boolean'],
         ]);
 
         foreach($attrs as $key => $value){
