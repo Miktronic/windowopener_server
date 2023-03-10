@@ -30,7 +30,7 @@ class DeviceController extends Controller
         $attrs = $request->validate([
             'alias' => ['nullable', 'string'],
             'device_address' => ['required', 'string'],
-            'type' => ['required', 'integer'],
+            'type' => ['nullable', 'integer'],
             'location' => ['nullable', 'string'],
             'country_id' => ['nullable', 'exists:countries,id'],
             'state_id' => ['nullable', 'exists:states,id'],
