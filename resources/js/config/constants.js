@@ -1,9 +1,6 @@
 const constants = {
-    PUBLIC_URL: "http://192.168.31.207:8000",
-    HOST_URL: "http://192.168.31.207:8000/api",
-
-    // PUBLIC_URL: "http://localhost:8000",
-    // HOST_URL: "http://localhost:8000/api",
+    PUBLIC_URL: process.env.MIX_HOST_URL,
+    HOST_URL: process.env.MIX_HOST_URL + "/api",
 
     headers: {
         "Content-Type": "application/json",
