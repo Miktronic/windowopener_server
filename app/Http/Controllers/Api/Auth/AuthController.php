@@ -31,12 +31,19 @@ class AuthController extends Controller
         ]);
 
         if (Auth::attempt(['email' => $request['email'], 'password' => $request['password']], $request['remember'])) {
-            $request->session()->regenerate();
+            // $request->session()->regenerate();
             $user = Auth::user();
+
+            if($user->role != 'admin'){
+                return response()->json(['msg' => 'Permission denied'], 403);
+
+            }
+            $user = User::findOrFail($user->id);
+            $token = $user->createToken('authToken')->plainTextToken;
 
             UserLog::create(['user_id' => $user->id, 'ip' => $request->ip()]);
 
-            return response()->json(['data' => $user]);
+            return response()->json(['data' => $user,'token'=>$token,'token_type'=>'Bearer']);
         } else {
             return response()->json(['message' => 'Invalid credentials'], 401);
         }

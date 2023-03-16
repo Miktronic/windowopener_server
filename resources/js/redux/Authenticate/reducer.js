@@ -1,4 +1,5 @@
 import actions from '../Authenticate/actions';
+import { axiosClient } from '../../config/axiosClient';
 
 const initialState = {
     isAuthenticated: false,
@@ -36,6 +37,11 @@ function Reducer(state = initialState, action) {
         case actions.LOGIN:
             return { ...state, loader: true }
         case actions.LOGIN_SUCCESS:
+            var token = action.payload.token;
+            var token_type = action.payload.token_type;
+            axiosClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            localStorage.setItem('token',`${token_type} ${token}`);
+
             return {
                 ...state,
                 isAuthenticated: !!action.payload.data.email,
@@ -50,6 +56,8 @@ function Reducer(state = initialState, action) {
         case actions.LOGOUT:
             return { ...state, logOutLoader: true }
         case actions.LOGOUT_SUCCESS:
+            localStorage.removeItem('token');
+            axiosClient.defaults.headers.common['Authorization'] = null;
             return { ...state, isAuthenticated: false, logOutLoader: false }
         case actions.LOGOUT_FAILURE:
             return { ...state, isAuthenticated: false, logOutLoader: false }

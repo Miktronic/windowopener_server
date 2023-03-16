@@ -1,17 +1,23 @@
 import axios from 'axios';
 import constants from './constants';
 
-const axiosClient = axios.create();
+
+export const axiosClient = axios.create();
 
 axiosClient.defaults.baseURL = constants.HOST_URL;
 
-axiosClient.defaults.headers = constants.headers;
+var token = '';
+if(token = localStorage.getItem('token')){
+  axiosClient.defaults.headers = {
+    ...constants.headers,
+  Authorization: token };
+}
 
 // To share cookies to cross site domain, change to true.
 axiosClient.defaults.withCredentials = false;
 
 export function getCustomRequest(URL) {
-  return axios.get(`/${URL}`).then(response => response);
+  return axiosClient.get(`/${URL}`).then(response => response);
 }
 
 export function getRequest(URL) {
