@@ -52,7 +52,7 @@ Route::group(['middleware' => 'auth:sanctum'], function() {
 
         // Device management
         Route::get('/devices', [App\Http\Controllers\Api\DeviceController::class,'get']);
-        Route::post('/device', [App\Http\Controllers\Api\DeviceController::class,'create']);
+        Route::post('/device', [App\Http\Controllers\Api\DeviceController::class,'store']);
         Route::delete('/device/{id}', [App\Http\Controllers\Api\DeviceController::class,'delete']);
         Route::post('/device-logs', [App\Http\Controllers\Api\DeviceLogController::class,'get']);
     });

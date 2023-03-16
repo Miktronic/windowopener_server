@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Device;
 use App\Models\DeviceLog;
+use Illuminate\Support\Facades\Log;
 
 class DeviceController extends Controller
 {
@@ -35,15 +36,15 @@ class DeviceController extends Controller
             'state_id' => ['nullable', 'exists:states,id'],
             'city_id' => ['nullable', 'exists:cities,id'],
             'user_id' => ['nullable', 'exists:users,id'],
-            'status' => ['required', 'integer'],
+            'status' => ['nullable', 'integer'],
             'is_temp_include' => ['nullable', 'boolean'],
             'is_hum_include' => ['nullable', 'boolean'],
         ]);
-
+        
         foreach($attrs as $key => $value){
             if($value === null) unset($attrs[$key]);
         }
-
+        
         $attrs['user_id'] = auth()->user()->id;
         return Device::create($attrs);
     }
