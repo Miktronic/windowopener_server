@@ -24,7 +24,6 @@ class UserController extends Controller
         $user->role = $request->role;
         $user->password = Hash::make($request->password);
         $user->email_verified_at = now();
-        $user->city_id = $request->city_id;
         $user->save();
         return response()->json(['data' => $user->makeVisible(['role'])]);
     }
