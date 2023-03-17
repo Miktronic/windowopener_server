@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Utils\ResponseUtil;
 use Illuminate\Http\Request;
 use App\Models\Device;
 use App\Models\DeviceLog;
@@ -46,11 +47,20 @@ class DeviceController extends Controller
         }
         
         $attrs['user_id'] = auth()->user()->id;
-        return Device::create($attrs);
+        try {
+            return Device::create($attrs);
+            
+        } catch (\Throwable $th) {
+            //throw $th;
+            Log::error('DeviceController store method ',$th->getTrace());
+            $msg = strpos($th->getMessage(),'Duplicate entry')?"Device Address exists":null;
+            return ResponseUtil::failedResponse($msg );
+        }   
     }
 
     public function update(Device $device, Request $request)
     {
+        try {
         $attrs = $request->validate([
            'alias' => ['sometimes', 'string'],
            'device_address' => ['sometimes', 'string'],
@@ -69,9 +79,17 @@ class DeviceController extends Controller
             if($value === null) unset($attrs[$key]);
         }
 
-        $device->update($attrs);
-
-        return $device;
+            $device->update($attrs);
+    
+            return $device;
+            
+        } catch (\Throwable $th) {
+            //throw $th;
+            Log::error('DeviceController update method ',$th->getTrace());
+            $msg='Update failed';
+            if($th->getCode()==500)$msg='Update Failed';
+            return ResponseUtil::failedResponse($msg);
+        }
     }
 
     public function delete($id) {
