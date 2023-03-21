@@ -58,12 +58,13 @@ class AuthController extends Controller
         }
 
         UserLog::create(['user_id' => Auth::user()->id, 'ip' => $request->ip()]);
-        $user = User::where('email', $request['email'])->firstOrFail();
+        $user = User::with('settings')->where('email', $request['email'])->firstOrFail();
         $token = $user->createToken('authToken')->plainTextToken;
 
         return response()->json([
             'access_token' => $token,
             'token_type' => 'Bearer',
+            'data'=> $user,
         ]);
     }
 
