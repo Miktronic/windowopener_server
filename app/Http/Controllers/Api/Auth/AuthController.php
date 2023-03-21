@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 class AuthController extends Controller
@@ -176,20 +177,30 @@ class AuthController extends Controller
     public function updateProfile(Request $request): JsonResponse
     {
         $user = User::find($request->user()->id);
-        if($request->has('name'))
+        if ($request->has('name')) {
             $user->name = $request->name;
-        if($request->has('gps_location'))
+        }
+        if ($request->has('gps_location')) {
             $user->gps_location = $request->gps_location;
-        if($request->has('address'))
+        }
+        if ($request->has('address')) {
             $user->address = $request->address;
-        if($request->has('zip_code'))
+        }
+        if ($request->has('zip_code')) {
             $user->zip_code = $request->zip_code;
-        if($request->has('latitude'))
+        }
+        if ($request->has('latitude')) {
             $user->latitude = $request->latitude;
-        if($request->has('longitude'))
+        }
+        if ($request->has('longitude')) {
             $user->longitude = $request->longitude;
+        }
         $user->save();
-        return response()->json(['data' => $user->makeHidden(['created_at', 'updated_at', 'email_verified_at', 'role'])], 201);
+        return response()->json([
+            'data' => $user->makeHidden([
+                'created_at', 'updated_at', 'email_verified_at', 'role'
+            ])
+        ], 201);
     }
 
     public function close(Request $request): JsonResponse
@@ -231,10 +242,12 @@ class AuthController extends Controller
         ]);
 
         $record = DB::table('password_resets')->where('email', $request->email)->where('token', $request->otp)->first();
-        if(!$record)
+        if (!$record) {
             return response()->json(["message" => "Your OTP code is invalid."], 403);
-        if(strtotime($record->created_at) - strtotime(date('Y-m-d H:i:s')) > 5 *60)
+        }
+        if (strtotime($record->created_at) - strtotime(date('Y-m-d H:i:s')) > 5 * 60) {
             return response()->json(["message" => "Your OTP code was expired. Please try again later."], 403);
+        }
 
         $user = User::where('email', $request->email)->first();
         $password = Str::random(10);
@@ -253,24 +266,31 @@ class AuthController extends Controller
 
     public function emailVerification(Request $request): JsonResponse
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'email' => ['required', 'string', 'email', 'max:255', 'exists:users,email'],
             'otp' => ['required', 'string', 'min:6', 'max:6']
         ]);
 
+        if ($validator->fails()) {
+            return response()->json($validator->fails());
+        }
         try {
-            $record = DB::table('password_resets')->where('email', $request->email)->where('token',
-                $request->otp)->first();
+            $data = $validator->validated();
+            $record = DB::table('password_resets')->where('email', $data['email'])->where('token',
+                $data['otp'])->first();
             if (!$record) {
                 return response()->json(["message" => "Your OTP code is invalid."], 403);
             }
             if (strtotime($record->created_at) - strtotime(date('Y-m-d H:i:s')) > 5 * 60) {
+                $record->delete();
                 return response()->json(["message" => "Your OTP code was expired. Please try again later."], 403);
             }
 
-            User::where('email', $request->email)->update([
+            User::where('email', $data['email'])->update([
                 'email_verified_at' => now()
             ]);
+
+            $record->delete();
 
             return response()->json(["message" => "Great! Successfully email verified."], 200);
         } catch (Exception $ex) {
@@ -280,13 +300,18 @@ class AuthController extends Controller
 
     public function resendEmailVerificationCode(Request $request): JsonResponse
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'email' => ['required', 'string', 'email', 'max:255', 'exists:users,email'],
         ]);
 
+        if ($validator->fails()) {
+            return response()->json($validator->errors());
+        }
+
         try {
-            $otp = $this->createPasswordResetRecode($request['email']);
-            Mail::to($request['email'])->send(new EmailVerification($otp));
+            $data = $validator->validated();
+            $otp = $this->createPasswordResetRecode($data['email']);
+            Mail::to($data['email'])->send(new EmailVerification($otp));
             if (Mail::failures()) {
                 return response()->json(["message" => "Sorry! Please try again later"], 424);
             }
