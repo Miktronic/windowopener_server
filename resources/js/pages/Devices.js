@@ -181,8 +181,8 @@ function Devices() {
     },
     {
       title: 'IsAuto',
-      dataIndex: 'is_auto',
-      key: 'is_auto',
+      dataIndex: ["user","settings","is_auto"],
+      key: ["user","settings","is_auto"],
       filters: [
         {
           text: 'Yes',
@@ -198,13 +198,13 @@ function Devices() {
     },
     {
       title: 'Low Temperature',
-      dataIndex: 'low_temperature',
-      key: 'low_temperature',
+      dataIndex: ['user','settings','low_temperature'],
+      key: ['user','settings','low_temperature'],
     },
     {
       title: 'High Temperature',
-      dataIndex: 'high_temperature',
-      key: 'high_temperature',
+      dataIndex: ['user','settings','high_temperature'],
+      key: ['user','settings','high_temperature'],
     },
     {
       title: 'Creator',

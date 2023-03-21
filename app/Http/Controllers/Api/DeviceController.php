@@ -12,12 +12,12 @@ use Illuminate\Support\Facades\Log;
 class DeviceController extends Controller
 {
     public function get(Request $request) {
-        $devices = Device::all();
+        $devices = Device::with('user')->get();
         return response()->json(['data' => $devices]);
     }
 
     public function getDevices(Request $request) {
-        $devices = Device::where('user_id', $request->user()->id)->get();
+        $devices = Device::all();
         return response()->json(['data' => $devices->makeHidden(['created_at', 'updated_at', 'type', 'creator', 'user_id', 'location', 'country_id', 'state_id', 'city_id'])]);
     }
 
