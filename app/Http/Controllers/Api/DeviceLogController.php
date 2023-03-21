@@ -11,6 +11,23 @@ use Illuminate\Support\Facades\Log;
 
 class DeviceLogController extends Controller
 {
+    public function index(){
+        try {
+            $user_id = auth()->user()->id;
+            $device_ids = Device::where('user_id',$user_id)->pluck('id');
+            
+            $logs = DeviceLog::whereIn('device_id',$device_ids)->get();
+            return response()->json(['data' => [
+                'total' => sizeOf($logs),
+                'items' => $logs->makeHidden(['device_id', 'status_label', 'device_alias', 'status', 'is_auto', 'temperature', 'device_address'])
+            ]]);
+            
+        } catch (\Throwable $th) {
+            //throw $th;
+            Log::error("DeviceLogController getLogsByApp method",$th->getTrace());
+            return ResponseUtil::failedResponse();
+        }        
+    }
     public function get(Request $request)
     {
         $query = DeviceLog::orderBy('timestamp', 'DESC');
@@ -36,10 +53,8 @@ class DeviceLogController extends Controller
             'page' => ['required', 'integer'],
         ]);
         try {
-            $user_id = auth()->user()->id;
-            $device_ids = Device::where('user_id',$user_id)->pluck('id');
             
-            $logs = DeviceLog::whereIn('device_id',$device_ids)->orderBy('timestamp', 'DESC')->skip($request->rows * ($request->page - 1))->take($request->rows)->get();
+            $logs = DeviceLog::orderBy('timestamp', 'DESC')->skip($request->rows * ($request->page - 1))->take($request->rows)->get();
             return response()->json(['data' => [
                 'total' => sizeOf($logs),
                 'items' => $logs->makeHidden(['device_id', 'status_label', 'device_alias', 'status', 'is_auto', 'temperature', 'device_address'])

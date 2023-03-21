@@ -82,6 +82,7 @@ Route::group(['middleware' => 'auth:sanctum'], function() {
             Route::delete('/{id}', [App\Http\Controllers\Api\DeviceController::class,'delete']);
         });
         Route::prefix('log')->group(function(){
+            Route::get('/', [App\Http\Controllers\Api\DeviceLogController::class,'index']);
             Route::post('/', [App\Http\Controllers\Api\DeviceLogController::class,'getLogsByApp']);
             Route::delete('/{id}', [App\Http\Controllers\Api\DeviceLogController::class,'deleteLogByApp']);
         });
