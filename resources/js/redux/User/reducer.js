@@ -31,8 +31,8 @@ function Reducer(state = initialState, action) {
             return { ...state, loader:true }
         case actions.DELETE_USER_SUCCESS:
             return {
-                users: [...state.users.filter((user) => user.id !== action.payload.data)],
-                loader: false
+                users: [...state.users.filter((user) => user.id != action.payload.data)],
+                loader: true
             }
         case actions.DELETE_USER_FAILURE:
             return { ...state, loader: false }

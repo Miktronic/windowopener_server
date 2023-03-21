@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Utils\ResponseUtil;
 use App\Models\Device;
 use App\Models\DeviceLog;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\UserLog;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
@@ -29,10 +31,18 @@ class UserController extends Controller
     }
 
     public function delete($id) {
-        User::destroy($id);
-        UserLog::where('user_id', $id)->delete();
-        Device::where('user_id', $id)->delete();
-        DeviceLog::where('user_id', $id)->delete();
-        return response()->json(['data' => $id]);
+        try {
+            User::destroy($id);
+            UserLog::where('user_id', $id)->delete();
+            $device_ids = Device::where('user_id')->pluck('id');
+            Device::where('user_id', $id)->delete();
+            DeviceLog::whereIn('device_id',$device_ids)->delete();
+            return response()->json(['data' => $id]);
+            
+        } catch (\Throwable $th) {
+            //throw $th;
+            Log::error('UserController delete method ',$th->getTrace());
+            return ResponseUtil::failedResponse();
+        }   
     }
 }
