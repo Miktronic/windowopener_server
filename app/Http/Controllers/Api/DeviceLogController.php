@@ -11,14 +11,18 @@ use Illuminate\Support\Facades\Log;
 
 class DeviceLogController extends Controller
 {
-    public function index(){
+    public function index(Request $request){
         try {
+            $limit = 10;
             $user_id = auth()->user()->id;
             $device_ids = Device::where('user_id',$user_id)->pluck('id');
             
-            $logs = DeviceLog::whereIn('device_id',$device_ids)->get();
+            $logs = DeviceLog::whereIn('device_id',$device_ids)->orderByDesc('timestamp')->paginate($limit);
+            
             return response()->json(['data' => [
-                'total' => sizeOf($logs),
+                // 'data'=>$logs,
+                'totalPage' => $logs->lastPage(),
+                'perPage'=>$logs->perPage(),
                 'items' => $logs->makeHidden(['device_id', 'status_label', 'device_alias', 'status', 'is_auto', 'temperature', 'device_address'])
             ]]);
             
