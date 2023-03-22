@@ -90,7 +90,7 @@ class AuthController extends Controller
         try {
             Mail::to($request['email'])->send(new EmailVerification($otp));
         }catch (\Exception $exception){
-            return response()->json(['message' => 'Failed to send verification email'], 424);
+            return response()->json(['message' => $exception->getMessage()], 424);
         }
 
         return response()->json([
@@ -292,14 +292,14 @@ class AuthController extends Controller
                 $data['otp'])->delete();
                 return response()->json(["message" => "Your OTP code was expired. Please try again later."], 403);
             }
-            
+
             User::where('email', $data['email'])->update([
                 'email_verified_at' => now()
             ]);
-            
+
             DB::table('password_resets')->where('email', $data['email'])->where('token',
             $data['otp'])->delete();
-            
+
 
             return response()->json(["message" => "Great! Successfully email verified."], 200);
         } catch (Exception $ex) {
