@@ -23,6 +23,8 @@ Route::prefix('v1')->group(function() {
         Route::post('/register', [App\Http\Controllers\Api\Auth\AuthController::class,'registerAppUser']);
         Route::post('/forgotPassword', [App\Http\Controllers\Api\Auth\AuthController::class,'forgotPassword']);
         Route::post('/resetPassword', [App\Http\Controllers\Api\Auth\AuthController::class,'resetPassword']);
+        Route::post('/emailVerification', [App\Http\Controllers\Api\Auth\AuthController::class,'emailVerification']);
+        Route::post('/resendEmailVerificationCode', [App\Http\Controllers\Api\Auth\AuthController::class,'resendEmailVerificationCode']);
     });
     Route::prefix('geo')->group(function(){
         Route::get('/countries', [App\Http\Controllers\Api\GeoController::class,'getCountries']);
@@ -59,7 +61,7 @@ Route::group(['middleware' => 'auth:sanctum'], function() {
 
     Route::delete('/logout', [App\Http\Controllers\Api\Auth\AuthController::class,'logout']);
 
-    Route::prefix('v1')->group(function() {
+    Route::prefix('v1')->middleware('verifyEmail')->group(function() {
         Route::prefix('user')->group(function(){
             Route::get('/profile', function (Request $request) {
                 return ['data' => $request->user()];

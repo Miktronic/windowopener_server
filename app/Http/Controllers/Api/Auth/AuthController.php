@@ -3,16 +3,19 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Mail\EmailVerification;
 use App\Mail\ForgotPassword;
 use App\Mail\ResetPassword;
 use App\Models\User;
 use App\Models\UserLog;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 class AuthController extends Controller
@@ -20,7 +23,7 @@ class AuthController extends Controller
     /**
      * Handle an authentication attempt.
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return JsonResponse
      */
     public function authenticate(Request $request): JsonResponse
@@ -34,16 +37,15 @@ class AuthController extends Controller
             // $request->session()->regenerate();
             $user = Auth::user();
 
-            if($user->role != 'admin'){
+            if ($user->role != 'admin') {
                 return response()->json(['msg' => 'Permission denied'], 403);
-
             }
             $user = User::findOrFail($user->id);
             $token = $user->createToken('authToken')->plainTextToken;
 
             UserLog::create(['user_id' => $user->id, 'ip' => $request->ip()]);
 
-            return response()->json(['data' => $user,'token'=>$token,'token_type'=>'Bearer']);
+            return response()->json(['data' => $user, 'token' => $token, 'token_type' => 'Bearer']);
         } else {
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
@@ -68,9 +70,8 @@ class AuthController extends Controller
         ]);
     }
 
-    public function registerAppUser(Request $request)
+    public function registerAppUser(Request $request): JsonResponse
     {
-
         $post_data = $request->validate([
             'email' => 'required|string|email|unique:users',
             'password' => 'required|min:8'
@@ -84,10 +85,24 @@ class AuthController extends Controller
 
         $token = $user->createToken('authToken')->plainTextToken;
 
+        $otp = $this->createPasswordResetRecode($request['email']);
+        Mail::to($request['email'])->send(new EmailVerification($otp));
+
         return response()->json([
             'access_token' => $token,
             'token_type' => 'Bearer',
         ]);
+    }
+
+    private function createPasswordResetRecode($email): int
+    {
+        $six_digit_random_number = rand(100000, 999999);
+        DB::table('password_resets')->insert([
+            'email' => $email,
+            'token' => $six_digit_random_number,
+            'created_at' => date('Y-m-d H:m:s')
+        ]);
+        return $six_digit_random_number;
     }
 
     public function register(Request $request): JsonResponse
@@ -163,20 +178,30 @@ class AuthController extends Controller
     public function updateProfile(Request $request): JsonResponse
     {
         $user = User::find($request->user()->id);
-        if($request->has('name'))
+        if ($request->has('name')) {
             $user->name = $request->name;
-        if($request->has('gps_location'))
+        }
+        if ($request->has('gps_location')) {
             $user->gps_location = $request->gps_location;
-        if($request->has('address'))
+        }
+        if ($request->has('address')) {
             $user->address = $request->address;
-        if($request->has('zip_code'))
+        }
+        if ($request->has('zip_code')) {
             $user->zip_code = $request->zip_code;
-        if($request->has('latitude'))
+        }
+        if ($request->has('latitude')) {
             $user->latitude = $request->latitude;
-        if($request->has('longitude'))
+        }
+        if ($request->has('longitude')) {
             $user->longitude = $request->longitude;
+        }
         $user->save();
-        return response()->json(['data' => $user->makeHidden(['created_at', 'updated_at', 'email_verified_at', 'role'])], 201);
+        return response()->json([
+            'data' => $user->makeHidden([
+                'created_at', 'updated_at', 'email_verified_at', 'role'
+            ])
+        ], 201);
     }
 
     public function close(Request $request): JsonResponse
@@ -210,7 +235,7 @@ class AuthController extends Controller
         return response()->json(["message" => "Great! Successfully send in your mail"], 200);
     }
 
-    public function resetPassword(Request $request):JsonResponse
+    public function resetPassword(Request $request): JsonResponse
     {
         $request->validate([
             'email' => ['required', 'string', 'email', 'max:255', 'exists:users,email'],
@@ -218,10 +243,12 @@ class AuthController extends Controller
         ]);
 
         $record = DB::table('password_resets')->where('email', $request->email)->where('token', $request->otp)->first();
-        if(!$record)
+        if (!$record) {
             return response()->json(["message" => "Your OTP code is invalid."], 403);
-        if(strtotime($record->created_at) - strtotime(date('Y-m-d H:i:s')) > 5 *60)
+        }
+        if (strtotime($record->created_at) - strtotime(date('Y-m-d H:i:s')) > 5 * 60) {
             return response()->json(["message" => "Your OTP code was expired. Please try again later."], 403);
+        }
 
         $user = User::where('email', $request->email)->first();
         $password = Str::random(10);
@@ -236,5 +263,62 @@ class AuthController extends Controller
         }
 
         return response()->json(["message" => "Great! Successfully send in your email."], 200);
+    }
+
+    public function emailVerification(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => ['required', 'string', 'email', 'max:255', 'exists:users,email'],
+            'otp' => ['required', 'string', 'min:6', 'max:6']
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->fails());
+        }
+        try {
+            $data = $validator->validated();
+            $record = DB::table('password_resets')->where('email', $data['email'])->where('token',
+                $data['otp'])->first();
+            if (!$record) {
+                return response()->json(["message" => "Your OTP code is invalid."], 403);
+            }
+            if (strtotime($record->created_at) - strtotime(date('Y-m-d H:i:s')) > 5 * 60) {
+                $record->delete();
+                return response()->json(["message" => "Your OTP code was expired. Please try again later."], 403);
+            }
+
+            User::where('email', $data['email'])->update([
+                'email_verified_at' => now()
+            ]);
+
+            $record->delete();
+
+            return response()->json(["message" => "Great! Successfully email verified."], 200);
+        } catch (Exception $ex) {
+            return response()->json(["message" => $ex->getMessage()], 424);
+        }
+    }
+
+    public function resendEmailVerificationCode(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => ['required', 'string', 'email', 'max:255', 'exists:users,email'],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors());
+        }
+
+        try {
+            $data = $validator->validated();
+            $otp = $this->createPasswordResetRecode($data['email']);
+            Mail::to($data['email'])->send(new EmailVerification($otp));
+            if (Mail::failures()) {
+                return response()->json(["message" => "Sorry! Please try again later"], 424);
+            }
+            return response()->json(["message" => "Great! Successfully send in your email"], 200);
+        } catch (Exception $ex) {
+            return response()->json(["message" => $ex->getMessage()], 424);
+        }
     }
 }
