@@ -86,7 +86,11 @@ class AuthController extends Controller
         $token = $user->createToken('authToken')->plainTextToken;
 
         $otp = $this->createPasswordResetRecode($request['email']);
-        Mail::to($request['email'])->send(new EmailVerification($otp));
+        try {
+            Mail::to($request['email'])->send(new EmailVerification($otp));
+        }catch (\Exception $exception){
+            return response()->json(['message' => 'Failed to send verification email'], 424);
+        }
 
         return response()->json([
             'access_token' => $token,
