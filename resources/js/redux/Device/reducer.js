@@ -32,8 +32,8 @@ function Reducer(state = initialState, action) {
         case actions.DELETE_DEVICE_SUCCESS:
             return {
                 ...state,
-                devices: state.devices.filter((device) => device.id === action.payload.data),
-                loader: false
+                devices: state.devices.filter((device) => device.id != action.payload.data),
+                loader: true
             }
         case actions.DELETE_DEVICE_FAILURE:
             return { ...state, loader: false }
