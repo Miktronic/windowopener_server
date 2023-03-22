@@ -287,7 +287,7 @@ class AuthController extends Controller
             if (!$record) {
                 return response()->json(["message" => "Your OTP code is invalid."], 403);
             }
-            if (strtotime($record->created_at) - strtotime(date('Y-m-d H:i:s')) > 30) {
+            if (strtotime($record->created_at) - strtotime(date('Y-m-d H:i:s')) > 5 * 60) {
                 DB::table('password_resets')->where('email', $data['email'])->where('token',
                 $data['otp'])->delete();
                 return response()->json(["message" => "Your OTP code was expired. Please try again later."], 403);
