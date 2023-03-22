@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -286,19 +287,23 @@ class AuthController extends Controller
             if (!$record) {
                 return response()->json(["message" => "Your OTP code is invalid."], 403);
             }
-            if (strtotime($record->created_at) - strtotime(date('Y-m-d H:i:s')) > 5 * 60) {
-                $record->delete();
+            if (strtotime($record->created_at) - strtotime(date('Y-m-d H:i:s')) > 30) {
+                DB::table('password_resets')->where('email', $data['email'])->where('token',
+                $data['otp'])->delete();
                 return response()->json(["message" => "Your OTP code was expired. Please try again later."], 403);
             }
-
+            
             User::where('email', $data['email'])->update([
                 'email_verified_at' => now()
             ]);
-
-            $record->delete();
+            
+            DB::table('password_resets')->where('email', $data['email'])->where('token',
+            $data['otp'])->delete();
+            
 
             return response()->json(["message" => "Great! Successfully email verified."], 200);
         } catch (Exception $ex) {
+            Log::error('AuthController emailVerification method : ',$ex->getTrace());
             return response()->json(["message" => $ex->getMessage()], 424);
         }
     }

@@ -17,8 +17,16 @@ class DeviceController extends Controller
     }
 
     public function getDevices(Request $request) {
-        $devices = Device::all();
-        return response()->json(['data' => $devices->makeHidden(['created_at', 'updated_at', 'type', 'creator', 'user_id', 'location', 'country_id', 'state_id', 'city_id'])]);
+        try {
+            $user_id = auth()->user()->id;
+            $devices = Device::where('user_id',$user_id)->get();
+            return response()->json(['data' => $devices->makeHidden(['created_at', 'updated_at', 'type', 'creator', 'user_id', 'location', 'country_id', 'state_id', 'city_id'])]);
+            
+        } catch (\Throwable $th) {
+            //throw $th;
+            Log::error('DeviceController getDevices method : ',$th->getTrace());
+            return ResponseUtil::failedResponse('Access Denied!',403);
+        }
     }
 
     public function getDeviceByApp($id) {
