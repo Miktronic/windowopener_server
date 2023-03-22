@@ -90,7 +90,7 @@ class AuthController extends Controller
         try {
             Mail::to($request['email'])->send(new EmailVerification($otp));
         }catch (\Exception $exception){
-            return response()->json(['message' => $exception->getMessage()], 424);
+            return response()->json(['message' => 'Failed to send verification email'], 424);
         }
 
         return response()->json([
