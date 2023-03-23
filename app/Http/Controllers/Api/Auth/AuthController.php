@@ -63,11 +63,25 @@ class AuthController extends Controller
         UserLog::create(['user_id' => Auth::user()->id, 'ip' => $request->ip()]);
         $user = User::with('settings')->where('email', $request['email'])->firstOrFail();
         $token = $user->createToken('authToken')->plainTextToken;
+        if($user->email_verified_at == null ){
+            $data = [
+                'message'=>'A mail send to your email. please verify first!',
+                'access_token' => $token,
+                'token_type' => 'Bearer',
+                'data'=> $user,
+                'verified'=>false,
+            ];
+            
+            $this->resendEmailVerificationCode(new Request(['email'=>$user->email]));
+            return response()->json($data,200);
+
+        }
 
         return response()->json([
             'access_token' => $token,
             'token_type' => 'Bearer',
             'data'=> $user,
+            'verified'=>true
         ]);
     }
 
