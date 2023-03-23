@@ -2,7 +2,10 @@
 
 namespace App\Observers;
 
+use App\Models\Setting;
 use App\Models\User;
+use App\Services\WeatherService;
+use Illuminate\Support\Facades\Log;
 
 class UserObserver
 {
@@ -18,6 +21,8 @@ class UserObserver
         $user->settings()->create([
             //
         ]);
+
+        $this->getOutsideTemp($user);
     }
 
     /**
@@ -29,6 +34,7 @@ class UserObserver
     public function updated(User $user)
     {
         //
+        $this->getOutsideTemp($user);
     }
 
     /**
@@ -62,5 +68,41 @@ class UserObserver
     public function forceDeleted(User $user)
     {
         //
+    }
+
+
+    /**
+     * Outside Temperature Sync 
+     * @param user user data 
+     */
+    protected function getOutsideTemp($user){
+        $weatherService = new WeatherService();
+        if($weatherService){
+            Log::info("Weather Service Connected! \n");
+
+        }
+        Log::info("Start syncing user " . $user->name . "\n");
+
+        // user lat, log
+        $lat = $user->latitude;
+        $long = $user->longitude;
+
+        if($lat && $long){
+            $response = $weatherService->get('current', ['q' => "$lat,$long"]);
+            if ($response['success']) {
+                Setting::query()->updateOrCreate(
+                    [
+                        'user_id' => $user->id,
+                    ],
+                    [
+                        'outside_temperature' => $response['data']['current']['temp_f'] ?? null,
+                    ]
+                );
+                Log::info('Outside Temperature : '.$response['data']['current']['temp_f']."\n");
+            }
+        }else{
+            Log::info("lat, long not found!! \n");
+        }
+        Log::info("End syncing user " . $user->name . "\n");
     }
 }
