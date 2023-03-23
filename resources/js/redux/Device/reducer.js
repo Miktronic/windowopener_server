@@ -22,8 +22,8 @@ function Reducer(state = initialState, action) {
         case actions.ADD_DEVICE_SUCCESS:
             return {
                 ...state,
-                devices: [...state.devices, action.payload.data],
-                loader: false
+                devices: [...state.devices, action.payload],
+                loader: true
             }
         case actions.ADD_DEVICE_FAILURE:
             return { ...state, loader: false }
