@@ -127,7 +127,7 @@ class DeviceObserver
         if($lat && $long){
             $response = $weatherService->get('current', ['q' => "$lat,$long"]);
             if ($response['success']) {
-                Setting::query()->updateOrCreate(
+                Setting::query()->update(
                     [
                         'user_id' => $user->id,
                     ],
