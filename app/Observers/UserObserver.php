@@ -87,6 +87,28 @@ class UserObserver
         $lat = $user->latitude;
         $long = $user->longitude;
 
+        //check for city lat long if there are any device
+        if(!$lat && !$long){
+            $devices = $user->devices; 
+            foreach ($devices as $device ) {
+                if($device->city){
+                    $lat = $device->city->latitude;
+                    $long = $device->city->longitude;
+                    break;
+                }
+                else if($device->state){
+                    $lat = $device->state->latitude;
+                    $long = $device->state->longitude;
+                    break;
+                }
+                else if($device->country){
+                    $lat = $device->country->latitude;
+                    $long = $device->country->longitude;
+                    break;
+                }
+            }
+        }
+
         if($lat && $long){
             $response = $weatherService->get('current', ['q' => "$lat,$long"]);
             if ($response['success']) {

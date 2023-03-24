@@ -19,17 +19,17 @@ class Device extends Model
     }
 
     public function getCountryAttribute() {
-        $country = Country::select('id', 'name')->find($this->country_id);
+        $country = Country::select('id', 'name','latitude','longitude')->find($this->country_id);
         return $country;
     }
 
     public function getStateAttribute() {
-        $state = State::select('id', 'name')->find($this->state_id);
+        $state = State::select('id', 'name','latitude','longitude')->find($this->state_id);
         return $state;
     }
 
     public function getCityAttribute() {
-        $city = City::select('id', 'name')->find($this->city_id);
+        $city = City::select('id', 'name','latitude','longitude')->find($this->city_id);
         return $city;
     }
 
