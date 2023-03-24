@@ -3,6 +3,9 @@
 namespace App\Observers;
 
 use App\Models\Device;
+use App\Models\Setting;
+use App\Models\User;
+use App\Services\WeatherService;
 use Illuminate\Support\Facades\Log;
 
 class DeviceObserver
@@ -16,6 +19,7 @@ class DeviceObserver
     public function created(Device $device)
     {
         $this->syncDeviceMode($device);
+        $this->getOutsideTemp($device->user);
     }
 
     /**
@@ -27,6 +31,7 @@ class DeviceObserver
     public function updated(Device $device)
     {
         $this->syncDeviceMode($device);
+        $this->getOutsideTemp($device->user);
     }
 
     /**
@@ -79,5 +84,62 @@ class DeviceObserver
 
         Log::info("Run this command: " . $cmd);
         shell_exec($cmd);
+    }
+
+    /**
+     * Outside Temperature Sync
+     * @param user user data
+     */
+    protected function getOutsideTemp($user){
+        $weatherService = new WeatherService();
+        if($weatherService){
+            Log::info("Weather Service Connected! \n");
+        }
+
+        Log::info("Start syncing user " . $user->name . "\n");
+
+        // user lat, log
+        $lat = $user->latitude;
+        $long = $user->longitude;
+
+        //check for city lat long if there are any device
+        if(!$lat && !$long){
+            $devices = $user->devices;
+            foreach ($devices as $device ) {
+                if($device->city){
+                    $lat = $device->city->latitude;
+                    $long = $device->city->longitude;
+                    break;
+                }
+                else if($device->state){
+                    $lat = $device->state->latitude;
+                    $long = $device->state->longitude;
+                    break;
+                }
+                else if($device->country){
+                    $lat = $device->country->latitude;
+                    $long = $device->country->longitude;
+                    break;
+                }
+            }
+        }
+
+        if($lat && $long){
+            $response = $weatherService->get('current', ['q' => "$lat,$long"]);
+            if ($response['success']) {
+                Setting::query()->updateOrCreate(
+                    [
+                        'user_id' => $user->id,
+                    ],
+                    [
+                        'outside_temperature' => $response['data']['current']['temp_f'] ?? null,
+                    ]
+                );
+                Log::info('Outside Temperature : '.$response['data']['current']['temp_f']."\n");
+            }
+        }else{
+            Log::info("lat, long not found!! \n");
+        }
+        Log::info("End syncing user " . $user->name . "\n");
     }
 }
