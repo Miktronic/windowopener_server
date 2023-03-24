@@ -3,7 +3,6 @@
 namespace App\Observers;
 
 use App\Models\Device;
-use App\Models\Setting;
 use App\Models\User;
 use App\Services\WeatherService;
 use Illuminate\Support\Facades\Log;
@@ -127,10 +126,7 @@ class DeviceObserver
         if($lat && $long){
             $response = $weatherService->get('current', ['q' => "$lat,$long"]);
             if ($response['success']) {
-                Setting::query()->update(
-                    [
-                        'user_id' => $user->id,
-                    ],
+                $user->settings()->update(
                     [
                         'outside_temperature' => $response['data']['current']['temp_f'] ?? null,
                     ]
