@@ -23,7 +23,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('outsideTemp:sync')->everyMinute();
-        $schedule->command('deviceStatus:sync')->everyMinute();
+        // $schedule->command('deviceStatus:sync')->everyMinute();
 
     }
 
