@@ -17,7 +17,7 @@ class DeviceLogController extends Controller
             $user_id = auth()->user()->id;
             $device_ids = Device::where('user_id',$user_id)->pluck('id');
             
-            $logs = DeviceLog::whereIn('device_id',$device_ids)->orderByDesc('timestamp')->paginate($limit);
+            $logs = DeviceLog::whereIn('device_id',$device_ids)->orderByDesc('id')->paginate($limit);
             
             return response()->json(['data' => [
                 // 'data'=>$logs,
