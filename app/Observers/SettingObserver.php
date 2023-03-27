@@ -16,7 +16,6 @@ class SettingObserver
     public function created(Setting $setting)
     {
         //
-        Log::info('settings create');
     }
 
     /**

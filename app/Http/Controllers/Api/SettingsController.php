@@ -36,7 +36,8 @@ class SettingsController extends Controller
         }
         $user = User::find($user->id);
         $settings = Setting::where('user_id',$user->id)->first();
-        $settings->update($attrs);
+        $settings->fill($attrs);
+        $settings->save();
         $settings = $user->settings;
 
         return SettingsResource::make($settings);
