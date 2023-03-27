@@ -75,14 +75,16 @@ class DeviceObserver
         $user = $device->user;
         $settings = $user->settings;
 
-        $is_auto = $settings->is_auto;
-        $low_temperature = $settings->low_temperature;
-        $high_temperature = $settings->high_temperature;
-
-        $cmd = 'mosquitto_pub -t /node/0/' . $device->device_address . ' -m "{\"id\":\"' . $device->device_address . '\",\"auto\":' . $is_auto . ',\"cmd\":' . $device->status . ',\"low_temp\":' . $low_temperature . ',\"high_temp\":' . $high_temperature . '}"';
-
-        Log::info("Run this command: " . $cmd);
-        shell_exec($cmd);
+        if($device->wasChanged('status')){
+            $is_auto = $settings->is_auto;
+            $low_temperature = $settings->low_temperature ?? 0;
+            $high_temperature = $settings->high_temperature ?? 0;
+    
+            $cmd = 'mosquitto_pub -t /node/0/' . $device->device_address . ' -m "{\"id\":\"' . $device->device_address . '\",\"auto\":' . $is_auto . ',\"cmd\":' . $device->status . ',\"low_temp\":' . $low_temperature . ',\"high_temp\":' . $high_temperature . '}"';
+    
+            Log::info("Run this command: " . $cmd);
+            shell_exec($cmd);
+        }
     }
 
     /**
