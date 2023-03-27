@@ -16,6 +16,7 @@ class SettingObserver
     public function created(Setting $setting)
     {
         //
+        Log::info('settings create');
     }
 
     /**
@@ -26,21 +27,7 @@ class SettingObserver
      */
     public function updated(Setting $setting)
     {
-        $user = $setting->user;
-        $devices = $user->devices;
-
-        $is_auto = $user->settings->is_auto;
-
-        foreach ($devices as $device){
-            $address = $device->address;
-            $low_temperature = $device->low_temperature;
-            $high_temperature = $device->high_temperature;
-
-            $cmd = 'mosquitto_pub -t /node/0/' . $address . ' -m "{\"id\":\"' . $address . '\",\"auto\":' . $is_auto . ',\"low_temp\":' . $low_temperature . ',\"high_temp\":' . $high_temperature . '}"';
-
-            Log::info("Run this command: " . $cmd);
-            shell_exec($cmd);
-        }
+        $this->deviceStatusUpdate($setting);         
     }
 
     /**
@@ -74,5 +61,25 @@ class SettingObserver
     public function forceDeleted(Setting $setting)
     {
         //
+    }
+
+    protected function deviceStatusUpdate($setting){
+
+        $user = $setting->user;
+        $devices = $user->devices;
+
+        $is_auto = $setting->is_auto;
+
+        foreach ($devices as $device){
+            $address = $device->device_address;
+            $cmd = $device->status;
+            $low_temperature = $setting->low_temperature ?? 0;
+            $high_temperature = $setting->high_temperature ?? 0;
+
+            $cmd = 'mosquitto_pub -t /node/0/' . $address . ' -m "{\"id\":\"' . $address . '\",\"auto\":' . $is_auto .'\"cmd\":' . $cmd . ',\"low_temp\":' . $low_temperature . ',\"high_temp\":' . $high_temperature . '}"';
+
+            Log::info("Run this command: " . $cmd);
+            shell_exec($cmd);
+        }
     }
 }

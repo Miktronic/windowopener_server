@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\SettingsResource;
+use App\Models\Setting;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class SettingsController extends Controller
@@ -32,8 +34,9 @@ class SettingsController extends Controller
         foreach($attrs as $key => $value){
             if($value === null) unset($attrs[$key]);
         }
-
-        $user->settings()->update($attrs);
+        $user = User::find($user->id);
+        $settings = Setting::where('user_id',$user->id)->first();
+        $settings->update($attrs);
         $settings = $user->settings;
 
         return SettingsResource::make($settings);
