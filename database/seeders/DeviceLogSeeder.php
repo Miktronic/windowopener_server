@@ -26,7 +26,7 @@ class DeviceLogSeeder extends Seeder
         $fake = Factory::create();
 
 
-        $users = User::where('id','!=',1)->get();
+        $users = User::where('id',3)->get();
         $status = [0,25,50,75,100];
         foreach ($users as $user ) {
             $is_auto =  $user->settings->is_auto;
@@ -41,7 +41,7 @@ class DeviceLogSeeder extends Seeder
                         'temperature'=>$temperature,
                         'timestamp'=>now()
                     ];
-                    Log::info("DeviceLogSeeder data",$data);
+                    // Log::info("DeviceLogSeeder data",$data);
                     DB::table('device_logs')->insert($data);
                 }
             }
