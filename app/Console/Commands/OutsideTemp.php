@@ -53,10 +53,7 @@ class OutsideTemp extends Command
             if($lat && $long){
                 $response = $weatherService->get('current', ['q' => "$lat,$long"]);
                 if ($response['success']) {
-                    Setting::query()->updateOrCreate(
-                        [
-                            'user_id' => $user->id,
-                        ],
+                    $user->settings()->update(
                         [
                             'outside_temperature' => $response['data']['current']['temp_f'] ?? null,
                         ]
