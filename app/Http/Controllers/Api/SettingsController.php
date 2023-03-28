@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\SettingsResource;
+use App\Http\Utils\ResponseUtil;
 use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -29,6 +30,10 @@ class SettingsController extends Controller
             'low_temperature' => ['nullable', 'numeric'],
             'high_temperature' => ['nullable', 'numeric'],
         ]);
+
+        if($attrs['low_temperature'] > $attrs['high_temperature']){
+            return ResponseUtil::failedResponse('Low Temperature cannot be higher than High Temperature');
+        }
 
         $user = auth()->user();
         foreach($attrs as $key => $value){
