@@ -20,7 +20,7 @@ class CreateSettingsTable extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
             $table->double('outside_temperature', 5, 2)->nullable();
-            $table->boolean('is_auto')->default(1);
+            $table->boolean('is_auto')->default(0);
             $table->double('low_temperature', 5, 2)->default(0);
             $table->double('high_temperature', 5, 2)->default(0);
             $table->timestamps();
