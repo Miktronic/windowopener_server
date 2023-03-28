@@ -25,6 +25,11 @@ class Kernel extends ConsoleKernel
         $schedule->command('outsideTemp:sync')->everyMinute();
         // $schedule->command('deviceStatus:sync')->everyMinute();
 
+        // clear log
+        $schedule->call(function () {
+            exec("truncate -s 0 storage/logs/laravel.log");
+        })->daily();
+
     }
 
     /**
