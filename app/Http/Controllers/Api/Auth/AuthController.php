@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Utils\ResponseUtil;
 use App\Mail\EmailVerification;
 use App\Mail\ForgotPassword;
 use App\Mail\ResetPassword;
@@ -194,31 +195,40 @@ class AuthController extends Controller
         ]);
     }
 
+    public function getProfile(Request $req): JsonResponse
+    {
+        $user_id = auth()->user()->id;
+        $user = User::findOrFail($user_id);
+
+        return response()->json(['data'=>$user->makeHidden(['city_id','country_id','state_id'])],200);
+
+    }
+
     public function updateProfile(Request $request): JsonResponse
     {
+        $dataValidat = Validator::make($request->all(),[
+            'name' => 'nullable|string',
+            'gps_location' => 'nullable|boolean',
+            'address' => 'nullable|string',
+            'zip_code' => 'nullable|string',
+            'latitude' => 'nullable|string',
+            'longitude' => 'nullable|string',
+            'country_id' => ['nullable', 'exists:countries,id'],
+            'state_id' => ['nullable', 'exists:states,id'],
+            'city_id' => ['nullable', 'exists:cities,id'],
+        ],[
+            'exists' => ":attribute doesn't exist"
+        ]);
+
+        if($dataValidat->fails()){
+            return ResponseUtil::failedResponse($dataValidat->errors()->all());
+        }
         $user = User::find($request->user()->id);
-        if ($request->has('name')) {
-            $user->name = $request->name;
-        }
-        if ($request->has('gps_location')) {
-            $user->gps_location = $request->gps_location;
-        }
-        if ($request->has('address')) {
-            $user->address = $request->address;
-        }
-        if ($request->has('zip_code')) {
-            $user->zip_code = $request->zip_code;
-        }
-        if ($request->has('latitude')) {
-            $user->latitude = $request->latitude;
-        }
-        if ($request->has('longitude')) {
-            $user->longitude = $request->longitude;
-        }
+        $user->fill($dataValidat->validated());
         $user->save();
         return response()->json([
             'data' => $user->makeHidden([
-                'created_at', 'updated_at', 'email_verified_at', 'role'
+                'created_at', 'updated_at', 'email_verified_at', 'role','country_id','state_id','city_id'
             ])
         ], 201);
     }

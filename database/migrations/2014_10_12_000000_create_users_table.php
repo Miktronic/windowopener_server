@@ -25,6 +25,9 @@ class CreateUsersTable extends Migration
             $table->string('zip_code')->nullable();
             $table->string('latitude')->nullable();
             $table->string('longitude')->nullable();
+            $table->foreignId('country_id')->nullable();
+            $table->foreignId('state_id')->nullable();
+            $table->foreignId('city_id')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
