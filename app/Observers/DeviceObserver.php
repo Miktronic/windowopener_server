@@ -105,23 +105,20 @@ class DeviceObserver
 
         //check for city lat long if there are any device
         if(!$lat && !$long){
-            $devices = $user->devices;
-            foreach ($devices as $device ) {
-                if($device->city){
-                    $lat = $device->city->latitude;
-                    $long = $device->city->longitude;
-                    break;
-                }
-                else if($device->state){
-                    $lat = $device->state->latitude;
-                    $long = $device->state->longitude;
-                    break;
-                }
-                else if($device->country){
-                    $lat = $device->country->latitude;
-                    $long = $device->country->longitude;
-                    break;
-                }
+            if($user->city){
+                $lat = $user->city->latitude;
+                $long = $user->city->longitude;
+                
+            }
+            else if($user->state){
+                $lat = $user->state->latitude;
+                $long = $user->state->longitude;
+                
+            }
+            else if($user->country){
+                $lat = $user->country->latitude;
+                $long = $user->country->longitude;
+                
             }
         }
 

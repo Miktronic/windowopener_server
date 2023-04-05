@@ -198,7 +198,7 @@ class AuthController extends Controller
     public function getProfile(Request $req): JsonResponse
     {
         $user_id = auth()->user()->id;
-        $user = User::findOrFail($user_id);
+        $user = User::with('settings')->findOrFail($user_id);
 
         return response()->json(['data'=>$user->makeHidden(['city_id','country_id','state_id'])],200);
 
@@ -226,6 +226,7 @@ class AuthController extends Controller
         $user = User::find($request->user()->id);
         $user->fill($dataValidat->validated());
         $user->save();
+        $user->settings;
         return response()->json([
             'data' => $user->makeHidden([
                 'created_at', 'updated_at', 'email_verified_at', 'role','country_id','state_id','city_id'
