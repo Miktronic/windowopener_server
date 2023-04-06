@@ -36,6 +36,23 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    protected $appends = ['country', 'state', 'city'];
+
+    public function getCountryAttribute() {
+        $country = Country::select('id', 'name','latitude','longitude')->find($this->country_id);
+        return $country;
+    }
+
+    public function getStateAttribute() {
+        $state = State::select('id', 'name','latitude','longitude')->find($this->state_id);
+        return $state;
+    }
+
+    public function getCityAttribute() {
+        $city = City::select('id', 'name','latitude','longitude')->find($this->city_id);
+        return $city;
+    }
+
     public function city(){
         return $this->belongsTo(City::class, 'city_id');
     }

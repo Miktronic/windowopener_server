@@ -15,14 +15,11 @@ class CreateDevicesTable extends Migration
     {
         Schema::create('devices', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->nullable();
             $table->string('alias')->nullable();
             $table->string('device_address')->unique();
             $table->integer('type')->default(1);
             $table->string('location')->nullable();
-            $table->foreignId('country_id')->nullable();
-            $table->foreignId('state_id')->nullable();
-            $table->foreignId('city_id')->nullable();
-            $table->foreignId('user_id');
             $table->integer('status')->default(0);
             $table->boolean('is_temp_include')->default(1);
             $table->boolean('is_hum_include')->default(1);

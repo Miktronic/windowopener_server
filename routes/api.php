@@ -63,9 +63,7 @@ Route::group(['middleware' => 'auth:sanctum'], function() {
 
     Route::prefix('v1')->middleware('verifyEmail')->group(function() {
         Route::prefix('user')->group(function(){
-            Route::get('/profile', function (Request $request) {
-                return ['data' => $request->user()];
-            });
+            Route::get('/profile', [App\Http\Controllers\Api\Auth\AuthController::class,'getProfile']);
             Route::post('/profile', [App\Http\Controllers\Api\Auth\AuthController::class,'updateProfile']);
             Route::post('/changePassword', [App\Http\Controllers\Api\Auth\AuthController::class,'changePasswordByAppUser']);
         });

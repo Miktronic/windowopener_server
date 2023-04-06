@@ -41,9 +41,6 @@ class DeviceController extends Controller
             'device_address' => ['required', 'string'],
             'type' => ['nullable', 'integer'],
             'location' => ['nullable', 'string'],
-            'country_id' => ['nullable', 'exists:countries,id'],
-            'state_id' => ['nullable', 'exists:states,id'],
-            'city_id' => ['nullable', 'exists:cities,id'],
             'user_id' => ['nullable', 'exists:users,id'],
             'status' => ['nullable', 'integer'],
             'is_temp_include' => ['nullable', 'boolean'],
@@ -61,7 +58,7 @@ class DeviceController extends Controller
         } catch (\Throwable $th) {
             //throw $th;
             Log::error('DeviceController store method ',$th->getTrace());
-            $msg = strpos($th->getMessage(),'Duplicate entry')?"Device Address exists":null;
+            $msg = strpos($th->getMessage(),'Duplicate entry')?"Device Address exists":$th->getMessage();
             return ResponseUtil::failedResponse($msg );
         }   
     }
@@ -74,9 +71,6 @@ class DeviceController extends Controller
            'device_address' => ['sometimes', 'string'],
            'type' => ['sometimes', 'integer'],
            'location' => ['sometimes', 'string'],
-           'country_id' => ['sometimes', 'exists:countries,id'],
-           'state_id' => ['sometimes', 'exists:states,id'],
-           'city_id' => ['sometimes', 'exists:cities,id'],
            'user_id' => ['sometimes', 'exists:users,id'],
            'status' => ['sometimes', 'integer'],
            'is_temp_include' => ['sometimes', 'boolean'],
