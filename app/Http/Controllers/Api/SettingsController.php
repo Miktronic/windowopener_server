@@ -31,8 +31,15 @@ class SettingsController extends Controller
             'high_temperature' => ['nullable', 'numeric'],
         ]);
 
-        if($attrs['low_temperature'] > $attrs['high_temperature']){
-            return ResponseUtil::failedResponse('Low Temperature cannot be higher than High Temperature');
+        if(isset($attrs['low_temperature']) && !isset($attrs['high_temperature']) ||
+        (!isset($attrs['low_temperature']) && isset($attrs['high_temperature']))){
+            return ResponseUtil::failedResponse('Low temperature & high temperature both need to fillup!');
+        }
+        
+        if(isset($attrs['low_temperature']) && isset($attrs['high_temperature'])){
+            if($attrs['low_temperature'] > $attrs['high_temperature']){
+                return ResponseUtil::failedResponse('Low Temperature cannot be higher than High Temperature');
+            }
         }
 
         $user = auth()->user();
